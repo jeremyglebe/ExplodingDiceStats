@@ -87,14 +87,10 @@ def probability_sum_of_exploding_dice(dice: list[int], target: int) -> float:
             "history": [],
         }
     )
-    # To get the total probability, we get the probability that none of the results will occur (1 - probability(x) for each result x, multiplied together)
-    probability_of_none_of_these_results = 1
-    for result in results:
-        result_of_this_result_not_occurring = 1 - result["probability"]
-        probability_of_none_of_these_results *= result_of_this_result_not_occurring
-    # Then we subtract that from 1 to get the probability that at least one of the results will occur
-    probability_of_at_least_one_result = 1 - probability_of_none_of_these_results
-    return probability_of_at_least_one_result
+    # Each successful result is a mutually exclusive terminal path through the tree.
+    # Its probability already includes every parent edge required to reach it, so the
+    # total probability of success is the sum of all successful leaf probabilities.
+    return sum(result["probability"] for result in results)
     # endregion
 
 

@@ -221,18 +221,18 @@
 
       <section class="algo-slide aggregation-slide" data-slide="10">
         <div class="slide-kicker">Combining the terminal successes</div>
-        <h2>Find the chance that <em>none of them occur.</em></h2>
+        <h2>Add the weights of the <em>successful leaves.</em></h2>
         <div class="aggregation-steps">
           <div><span>01</span><b>Collect success nodes</b><p>Each “target reached” node carries its complete path probability <code>pᵢ</code>.</p></div>
-          <div><span>02</span><b>Flip each probability</b><p>The chance of that individual result not occurring is <code>1 − pᵢ</code>.</p></div>
-          <div><span>03</span><b>Multiply the non-results</b><p>Multiply every individual non-occurrence chance together.</p></div>
-          <div><span>04</span><b>Flip the combined result</b><p>Subtract from 100% to get the chance of at least one success.</p></div>
+          <div><span>02</span><b>Keep the cascaded weight</b><p>The child probability already includes every parent edge required to reach that leaf.</p></div>
+          <div><span>03</span><b>Recognize separate histories</b><p>One roll follows one path, so different terminal leaves are mutually exclusive results.</p></div>
+          <div><span>04</span><b>Add every success leaf</b><p>The combined probability is the sum of all recorded successful path probabilities.</p></div>
         </div>
         <div class="aggregation-formula">
-          <span>P(no success result) = ∏(1 − pᵢ)</span>
-          <strong>P(success) = 1 − ∏(1 − pᵢ)</strong>
+          <span>P(success) = p₁ + p₂ + p₃ + …</span>
+          <strong>P(success) = Σ pᵢ = 26.0417%</strong>
         </div>
-        <p class="aside-note strong">This is the final aggregation performed by the original Python implementation.</p>
+        <p class="aside-note strong">For exploding d4 + d6 vs. 10, the successful leaf weights add to 25/96.</p>
       </section>
 
       <section class="algo-slide code-slide" data-slide="11">
@@ -252,16 +252,12 @@
     else:
       search(child)
 
-none = 1
-for p in recorded_probabilities:
-  none = none * (1 - p)
-
-success = 1 - none</code></pre>
+success = sum(recorded_probabilities)</code></pre>
           <div class="code-summary">
             <b>Branch.</b>
             <b>Weight.</b>
             <b>Prune.</b>
-            <b>Combine.</b>
+            <b>Add the leaves.</b>
             <a href="index.html#odds">Return to the calculator <span aria-hidden="true">→</span></a>
           </div>
         </div>
