@@ -503,37 +503,115 @@ h2 em {
   line-height: 0.8;
 }
 
-.bar-row {
-  margin-top: 1rem;
-}
-
-.bar-label {
-  margin-bottom: 0.4rem;
-  font-size: 0.82rem;
-}
-
-.bar-label span {
+.bar-scale-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.4rem;
+  padding-bottom: 0.2rem;
   color: rgba(247, 242, 232, 0.65);
+  font-size: 0.72rem;
 }
 
-.bar-track {
+.bar-scale-heading span {
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bar-scale-heading b {
+  font-weight: 700;
+}
+
+.stacked-bar {
+  position: relative;
+  display: flex;
   height: 17px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 999px;
 }
 
-.bar-track i {
+.stacked-bar::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  content: "";
+  background: rgba(247, 242, 232, 0.28);
+}
+
+.stacked-bar i {
   display: block;
-  width: 50%;
   height: 100%;
-  background: var(--blue);
-  border-radius: inherit;
   transition: width 300ms ease;
 }
 
-.bar-row.accent .bar-track i {
+.normal-segment {
+  width: 50%;
+  background: var(--blue);
+  border-radius: 999px 0 0 999px;
+}
+
+.bonus-segment {
+  width: 10%;
   background: var(--yellow);
+  border-radius: 0 999px 999px 0;
+}
+
+.stacked-labels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0 0.55rem;
+}
+
+.stacked-labels > div {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.45rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.stacked-labels i {
+  width: 11px;
+  aspect-ratio: 1;
+  border-radius: 3px;
+}
+
+.normal-swatch { background: var(--blue); }
+.bonus-swatch { background: var(--yellow); }
+
+.stacked-labels span {
+  overflow: hidden;
+  color: rgba(247, 242, 232, 0.65);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stacked-labels b {
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar-axis {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  color: rgba(247, 242, 232, 0.45);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar-axis span:nth-child(2) {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .note {
@@ -913,6 +991,189 @@ h2 em {
   font-weight: 650;
 }
 
+.card-link {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1.1rem;
+  padding: 0 0 0.2rem;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid currentColor;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.card-link:hover span {
+  transform: translateX(3px);
+}
+
+.card-link span {
+  transition: transform 130ms ease;
+}
+
+.explainer {
+  width: min(900px, calc(100% - 2rem));
+  max-height: calc(100svh - 2rem);
+  padding: 0;
+  color: var(--ink);
+  background: var(--cream);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: 10px 10px 0 var(--ink);
+}
+
+.explainer::backdrop {
+  background: rgba(22, 24, 47, 0.78);
+  backdrop-filter: blur(5px);
+}
+
+.explainer-inner {
+  padding: clamp(1.25rem, 4vw, 3rem);
+}
+
+.explainer-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dialog-close {
+  display: grid;
+  width: 36px;
+  aspect-ratio: 1;
+  place-items: center;
+  color: var(--ink);
+  background: var(--yellow);
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.explainer-heading h2 {
+  max-width: 720px;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+}
+
+.explainer-heading > p:last-child {
+  max-width: 700px;
+  color: rgba(22, 24, 47, 0.68);
+}
+
+.algorithm-steps {
+  display: grid;
+  gap: 0;
+  margin: 2.5rem 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--ink);
+}
+
+.algorithm-steps li {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 1rem;
+  padding: 1.4rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.algorithm-steps li > span {
+  display: grid;
+  width: 42px;
+  aspect-ratio: 1;
+  place-items: center;
+  background: var(--yellow);
+  border: 2px solid var(--ink);
+  border-radius: 11px;
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.algorithm-steps h3 {
+  margin-bottom: 0.4rem;
+  font-size: 1.2rem;
+}
+
+.algorithm-steps p {
+  margin-bottom: 0.65rem;
+  color: rgba(22, 24, 47, 0.68);
+  font-size: 0.9rem;
+}
+
+.algorithm-steps code,
+.formula-line {
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.formula-line {
+  display: inline-block;
+  padding: 0.5rem 0.65rem;
+  background: rgba(109, 132, 255, 0.12);
+  border-radius: 8px;
+  font-size: 0.78rem;
+}
+
+.worked-example {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  background: var(--blue);
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 6px 6px 0 var(--ink);
+  color: white;
+}
+
+.worked-example span {
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.worked-example h3 {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1;
+}
+
+.example-equation {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 1rem;
+  align-items: center;
+}
+
+.example-equation strong {
+  color: var(--yellow);
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.example-equation i {
+  grid-column: 1 / -1;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.7rem;
+  font-style: normal;
+  text-align: right;
+}
+
+.explainer-done {
+  margin-top: 1.5rem;
+}
+
 .closing-note {
   display: flex;
   align-items: end;
@@ -1032,6 +1293,20 @@ h2 em {
   .closing-note {
     display: grid;
     gap: 1.5rem;
+  }
+
+  .worked-example {
+    grid-template-columns: 1fr;
+  }
+
+  .stacked-labels {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .algorithm-steps li {
+    grid-template-columns: 42px 1fr;
+    gap: 0.75rem;
   }
 }
 

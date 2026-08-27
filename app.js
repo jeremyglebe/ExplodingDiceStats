@@ -202,14 +202,21 @@ function renderAverage() {
   const sides = state.averageSides;
   const normal = (sides + 1) / 2;
   const exploding = explodingAverage(sides);
-  const scale = sides * 0.72;
+  const scale = sides;
 
   byId("average-die-label").textContent = `d${sides}`;
   byId("average-value").textContent = exploding.toFixed(2);
   byId("normal-average").textContent = normal.toFixed(2);
-  byId("exploding-average").textContent = exploding.toFixed(2);
+  byId("explosion-bonus").textContent = `+${(exploding - normal).toFixed(2)}`;
   byId("normal-bar").style.width = `${Math.min(100, (normal / scale) * 100)}%`;
-  byId("exploding-bar").style.width = `${Math.min(100, (exploding / scale) * 100)}%`;
+  byId("explosion-bonus-bar").style.width = `${Math.min(100, ((exploding - normal) / scale) * 100)}%`;
+  byId("average-stacked-bar").setAttribute(
+    "aria-label",
+    `On a zero to ${sides} scale, the normal d${sides} average is ${normal.toFixed(2)} and explosions add ${(exploding - normal).toFixed(2)}, for ${exploding.toFixed(2)} total.`,
+  );
+  byId("bar-scale-label").textContent = `Same 0–${sides} scale`;
+  byId("bar-axis-mid").textContent = sides / 2;
+  byId("bar-axis-max").textContent = `${sides} · d${sides} maximum face`;
   setSelectedButton(byId("average-picker"), "sides", sides);
 }
 
@@ -328,6 +335,15 @@ const observer = new IntersectionObserver((entries) => {
 }, { rootMargin: "-40% 0px -45% 0px" });
 
 document.querySelectorAll("[data-chapter]").forEach((section) => observer.observe(section));
+
+const sumExplainer = byId("sum-explainer");
+
+byId("open-sum-explainer").addEventListener("click", () => sumExplainer.showModal());
+byId("close-sum-explainer").addEventListener("click", () => sumExplainer.close());
+byId("done-sum-explainer").addEventListener("click", () => sumExplainer.close());
+sumExplainer.addEventListener("click", (event) => {
+  if (event.target === sumExplainer) sumExplainer.close();
+});
 
 renderAverage();
 updateLab();

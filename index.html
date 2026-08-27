@@ -107,13 +107,22 @@
               <strong id="average-value">4.20</strong>
             </div>
             <div class="bar-compare">
-              <div class="bar-row">
-                <div class="bar-label"><span>Normal die</span><b id="normal-average">3.50</b></div>
-                <div class="bar-track"><i id="normal-bar"></i></div>
+              <div class="bar-scale-heading">
+                <span>What makes up the average?</span>
+                <b id="bar-scale-label">Same 0–6 scale</b>
               </div>
-              <div class="bar-row accent">
-                <div class="bar-label"><span>Exploding die</span><b id="exploding-average">4.20</b></div>
-                <div class="bar-track"><i id="exploding-bar"></i></div>
+              <div class="stacked-labels">
+                <div><i class="normal-swatch"></i><span>Normal average</span><b id="normal-average">3.50</b></div>
+                <div><i class="bonus-swatch"></i><span>Explosion bonus</span><b id="explosion-bonus">+0.70</b></div>
+              </div>
+              <div class="stacked-bar" id="average-stacked-bar" role="img" aria-label="Normal average plus the additional average created by explosions">
+                <i class="normal-segment" id="normal-bar"></i>
+                <i class="bonus-segment" id="explosion-bonus-bar"></i>
+              </div>
+              <div class="bar-axis" aria-hidden="true">
+                <span>0</span>
+                <span id="bar-axis-mid">3</span>
+                <span id="bar-axis-max">6 · maximum face</span>
               </div>
             </div>
             <p class="note"><span aria-hidden="true">✦</span> Two exploding d6s average 8.4. Just add their averages together.</p>
@@ -224,6 +233,7 @@
             <h3>Added dice vs. a target</h3>
             <code>p = 1 − P(sum is below target)</code>
             <p>Build each die’s exact outcomes, combine them, then count the failures.</p>
+            <button class="card-link" id="open-sum-explainer" type="button">How does that work? <span aria-hidden="true">→</span></button>
           </article>
         </div>
 
@@ -236,5 +246,84 @@
         </div>
       </section>
     </main>
+
+    <dialog class="explainer" id="sum-explainer" aria-labelledby="sum-explainer-title">
+      <div class="explainer-inner">
+        <div class="explainer-topline">
+          <span>Added exploding dice</span>
+          <button class="dialog-close" id="close-sum-explainer" type="button" aria-label="Close explanation">×</button>
+        </div>
+
+        <div class="explainer-heading">
+          <p class="eyebrow">Exact odds, no simulation</p>
+          <h2 id="sum-explainer-title">Combine the failures.<br /><em>Then flip them.</em></h2>
+          <p>
+            For added dice, there is no single shortcut formula. Instead, the calculator builds each
+            die’s exact outcome distribution and combines those distributions one die at a time.
+          </p>
+        </div>
+
+        <ol class="algorithm-steps">
+          <li>
+            <span>01</span>
+            <div>
+              <h3>List each die’s possible totals</h3>
+              <p>
+                On an exploding d<span class="math-var">n</span>, a final total has the form
+                <code>k·n + r</code>, where <code>k</code> is the number of explosions and
+                <code>r</code> is a final roll from 1 to <code>n−1</code>.
+              </p>
+              <code class="formula-line">P(total = k·n + r) = 1 / n<sup>k+1</sup></code>
+            </div>
+          </li>
+          <li>
+            <span>02</span>
+            <div>
+              <h3>Combine one die at a time</h3>
+              <p>
+                For every old total and every possible result on the next die, multiply their
+                probabilities and add that chance to the new combined total. This operation is called
+                a <strong>convolution</strong>.
+              </p>
+              <code class="formula-line">P(sum = s) = Σ P(old = x) × P(next = s−x)</code>
+            </div>
+          </li>
+          <li>
+            <span>03</span>
+            <div>
+              <h3>Keep only the failures</h3>
+              <p>
+                We only need combined totals below the target. Anything at or above it has already
+                succeeded, so it can be left out of the next round of calculation.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>04</span>
+            <div>
+              <h3>Subtract from 100%</h3>
+              <p>Add all remaining failure probabilities, then flip the answer.</p>
+              <code class="formula-line">success = 1 − P(combined total &lt; target)</code>
+            </div>
+          </li>
+        </ol>
+
+        <div class="worked-example">
+          <div>
+            <span>Worked example</span>
+            <h3>Exploding d4 + d6 vs. 10</h3>
+          </div>
+          <div class="example-equation">
+            <span>Chance the sum stays below 10</span>
+            <strong>73.9583%</strong>
+            <i aria-hidden="true">↓ flip it</i>
+            <span>Chance the sum reaches 10</span>
+            <strong>26.0417%</strong>
+          </div>
+        </div>
+
+        <button class="primary-button explainer-done" id="done-sum-explainer" type="button">Got it</button>
+      </div>
+    </dialog>
   </body>
 </html>
