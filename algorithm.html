@@ -177,24 +177,34 @@
 
       <section class="algo-slide" data-slide="8">
         <div class="slide-kicker">The data model</div>
-        <h2>A tree in code. <em>A graph in the model.</em></h2>
-        <div class="model-compare">
-          <div>
-            <h3>Recorded histories form a tree</h3>
-            <div class="simple-tree" aria-hidden="true">
-              <b>A</b><div><b>B</b><b>C</b></div><div><b>D</b><b>E</b><b>F</b><b>G</b></div>
-            </div>
-            <p>Every unique sequence of rolls gets its own path and terminal leaf.</p>
+        <h2>The graph is a <em>directed result tree.</em></h2>
+        <div class="tree-model-layout">
+          <div class="tree-diagram" aria-label="A root result state branching to failure, continuing, and success result nodes">
+            <ul>
+              <li>
+                <div class="tree-node root-tree-node"><b>ROOT</b><span>total 0</span></div>
+                <ul>
+                  <li><div class="tree-node failure-tree-node"><b>3 + 5</b><span>failure leaf</span></div></li>
+                  <li>
+                    <div class="tree-node continue-tree-node"><b>4 + 5</b><span>continue</span></div>
+                    <ul>
+                      <li><div class="tree-node failure-tree-node"><b>+1</b><span>failure leaf</span></div></li>
+                      <li><div class="tree-node success-tree-node"><b>+4</b><span>success leaf</span></div></li>
+                    </ul>
+                  </li>
+                  <li><div class="tree-node success-tree-node"><b>4 + 6</b><span>success leaf</span></div></li>
+                </ul>
+              </li>
+            </ul>
           </div>
-          <div>
-            <h3>Equivalent states can form a DAG</h3>
-            <div class="simple-dag" aria-hidden="true">
-              <div><b>A</b><b>B</b></div><b class="merged">same state</b><b>terminal</b>
-            </div>
-            <p>Two histories that reach the same <code>(total, active dice)</code> can be merged or memoized.</p>
-          </div>
+          <dl class="graph-vocabulary">
+            <div><dt>Nodes</dt><dd>The complete result state recorded after one roll combination.</dd></div>
+            <div><dt>Directed edges</dt><dd>Every possible next combination rolled from the parent node.</dd></div>
+            <div><dt>Edge weights</dt><dd>The local chance of that combination; multiplied into the parent’s path probability.</dd></div>
+            <div><dt>Leaves</dt><dd>Terminal success or failure nodes with no children to explore.</dd></div>
+          </dl>
         </div>
-        <p class="aside-note strong">The recursive implementation walks a weighted result tree; graph language describes the reusable state structure beneath it.</p>
+        <p class="aside-note strong">Every node has exactly one parent and one recorded history. No branches are merged.</p>
       </section>
 
       <section class="algo-slide" data-slide="9">
