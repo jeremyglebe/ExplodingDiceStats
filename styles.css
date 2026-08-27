@@ -1031,6 +1031,14 @@ h2 em {
   flex: none;
 }
 
+.closing-links {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 1rem 1.5rem;
+}
+
 @media (max-width: 900px) {
   .chapter-nav .chapter-link {
     width: 34px;
@@ -1130,6 +1138,10 @@ h2 em {
   .closing-note {
     display: grid;
     gap: 1.5rem;
+  }
+
+  .closing-links {
+    justify-content: flex-start;
   }
 
   .stacked-labels {
