@@ -336,14 +336,5 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll("[data-chapter]").forEach((section) => observer.observe(section));
 
-const sumExplainer = byId("sum-explainer");
-
-byId("open-sum-explainer").addEventListener("click", () => sumExplainer.showModal());
-byId("close-sum-explainer").addEventListener("click", () => sumExplainer.close());
-byId("done-sum-explainer").addEventListener("click", () => sumExplainer.close());
-sumExplainer.addEventListener("click", (event) => {
-  if (event.target === sumExplainer) sumExplainer.close();
-});
-
 renderAverage();
 updateLab();

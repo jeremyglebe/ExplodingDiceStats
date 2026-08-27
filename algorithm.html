@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A visual walkthrough of the weighted graph search used to calculate exploding dice sums." />
+    <meta name="theme-color" content="#16182f" />
+    <title>The Exploding Dice Graph Algorithm</title>
+    <link rel="stylesheet" href="algorithm.css" />
+    <script src="algorithm.js" defer></script>
+  </head>
+  <body>
+    <header class="deck-topbar">
+      <a href="index.html#cheatsheet" class="back-link"><span aria-hidden="true">←</span> Field guide</a>
+      <span class="deck-title">The graph algorithm</span>
+      <span class="slide-count"><b id="current-slide">1</b> / <span id="total-slides">10</span></span>
+    </header>
+
+    <main class="slide-deck" id="slide-deck" aria-live="polite">
+      <section class="algo-slide cover-slide is-active" data-slide="1">
+        <div class="slide-kicker">Exploding dice, precisely</div>
+        <div class="cover-grid">
+          <div>
+            <h1>Exploding dice are a <em>graph search.</em></h1>
+            <p>Build weighted branches. Carry probability forward. Stop a branch as soon as its answer is known.</p>
+          </div>
+          <div class="cover-tree" aria-hidden="true">
+            <div class="mini-node root">start</div>
+            <div class="mini-level">
+              <div class="mini-node">2, 3</div>
+              <div class="mini-node hot">4, 5</div>
+              <div class="mini-node success">4, 6</div>
+            </div>
+            <div class="mini-level lower">
+              <div></div>
+              <div class="mini-node hot">+4</div>
+              <div></div>
+            </div>
+          </div>
+        </div>
+        <p class="slide-hint">Use ← and → or the controls below</p>
+      </section>
+
+      <section class="algo-slide" data-slide="2">
+        <div class="slide-kicker">The unit of work</div>
+        <h2>Every node records one <em>result state.</em></h2>
+        <div class="state-layout">
+          <div class="state-node">
+            <span>NODE 27 · EXAMPLE</span>
+            <dl>
+              <div><dt>dice being rolled</dt><dd>[d4, d6]</dd></div>
+              <div><dt>dice results</dt><dd>[3, 6]</dd></div>
+              <div><dt>path probability</dt><dd>1/24 × 1/24 = 1/576</dd></div>
+              <div><dt>total at this point</dt><dd>19</dd></div>
+              <div><dt>beats target 18?</dt><dd>true</dd></div>
+              <div><dt>terminating node?</dt><dd>target reached</dd></div>
+            </dl>
+          </div>
+          <div class="state-explanation">
+            <p>The node contains everything needed to decide what happens next.</p>
+            <ul>
+              <li><b>Dice + results</b> define the new branches: only maximum results explode.</li>
+              <li><b>Path probability</b> is this roll’s chance multiplied by its parent’s probability.</li>
+              <li><b>Total + target test</b> decide whether the branch has already succeeded.</li>
+              <li><b>Termination reason</b> is one of: target reached, no explosions, or continue.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="algo-slide" data-slide="3">
+        <div class="slide-kicker">Starting the search · d4 + d6 vs. 10</div>
+        <h2>The root activates <em>every die.</em></h2>
+        <p class="slide-lede">A synthetic root marks both dice as “exploded,” forcing the first recursive call to roll the full pool.</p>
+        <div class="root-graph" aria-label="Representative branches from the first d4 and d6 roll">
+          <div class="graph-node root-node"><b>ROOT</b><span>total 0 · p = 1</span><small>active [d4, d6]</small></div>
+          <div class="edge-label">24 equally likely combinations · each edge × 1/24</div>
+          <div class="child-row">
+            <div class="graph-node dead"><b>3 + 5</b><span>total 8 · p = 1/24</span><small>no active dice → failure</small></div>
+            <div class="graph-node open"><b>4 + 5</b><span>total 9 · p = 1/24</span><small>d4 active → recurse</small></div>
+            <div class="graph-node success"><b>4 + 6</b><span>total 10 · p = 1/24</span><small>target reached → success</small></div>
+          </div>
+        </div>
+        <p class="aside-note">These are 3 representative children. The same rule creates the other 21.</p>
+      </section>
+
+      <section class="algo-slide" data-slide="4">
+        <div class="slide-kicker">Recursive expansion</div>
+        <h2>Only exploding dice create the <em>next frontier.</em></h2>
+        <div class="cascade">
+          <div class="cascade-step">
+            <span>First roll</span>
+            <div class="graph-node open"><b>d4: 4 · d6: 1</b><small>total 5 · p = 1/24</small></div>
+          </div>
+          <div class="cascade-arrow"><b>× 1/4</b><span>reroll d4</span></div>
+          <div class="cascade-step branch-step">
+            <span>Four children</span>
+            <div class="tiny-children">
+              <div class="graph-node dead"><b>+1</b><small>6 · stop</small></div>
+              <div class="graph-node dead"><b>+2</b><small>7 · stop</small></div>
+              <div class="graph-node dead"><b>+3</b><small>8 · stop</small></div>
+              <div class="graph-node open"><b>+4</b><small>9 · recurse</small></div>
+            </div>
+          </div>
+          <div class="cascade-arrow"><b>× 1/4</b><span>reroll d4</span></div>
+          <div class="cascade-step">
+            <span>One child shown</span>
+            <div class="graph-node success"><b>+1</b><small>total 10 · p = 1/384</small></div>
+          </div>
+        </div>
+        <p class="aside-note">Branches that did not roll a maximum have no active dice. Their result is final.</p>
+      </section>
+
+      <section class="algo-slide probability-slide" data-slide="5">
+        <div class="slide-kicker">Weighted edges</div>
+        <h2>Child probability equals <em>parent × edge.</em></h2>
+        <div class="probability-chain">
+          <div><span>root</span><b>1</b></div>
+          <i>× 1/24</i>
+          <div><span>roll 4 + 1</span><b>1/24</b></div>
+          <i>× 1/4</i>
+          <div><span>reroll 4</span><b>1/96</b></div>
+          <i>× 1/4</i>
+          <div class="success-weight"><span>reroll 1 · success</span><b>1/384</b></div>
+        </div>
+        <p class="big-rule">Every terminal node already contains the probability of its complete history.</p>
+      </section>
+
+      <section class="algo-slide population-slide" data-slide="6">
+        <div class="slide-kicker">The same search at processor speed</div>
+        <div class="population-heading">
+          <h2>Now let the whole graph <em>explode.</em></h2>
+          <button id="replay-population" type="button">Replay population <span aria-hidden="true">↻</span></button>
+        </div>
+        <p class="slide-lede">Every flash is a result node. Yellow keeps branching; green and gray terminate immediately.</p>
+        <div class="population-layout">
+          <div class="population-frame">
+            <canvas id="population-canvas" role="img" aria-label="Animated weighted result graph for an exploding d4 plus d6 against target 10"></canvas>
+            <div class="population-stats" aria-live="polite">
+              <span><i class="open-dot"></i> expanded <b id="open-node-count">0</b></span>
+              <span><i class="success-dot"></i> success <b id="success-node-count">0</b></span>
+              <span><i class="failure-dot"></i> failure <b id="failure-node-count">0</b></span>
+            </div>
+          </div>
+          <aside class="live-node-card" aria-live="polite">
+            <span id="live-node-label">CURRENT NODE</span>
+            <dl>
+              <div><dt>dice rolled</dt><dd id="live-node-dice">—</dd></div>
+              <div><dt>results</dt><dd id="live-node-results">—</dd></div>
+              <div><dt>path probability</dt><dd id="live-node-probability">1</dd></div>
+              <div><dt>total</dt><dd id="live-node-total">0</dd></div>
+              <div><dt>beats target?</dt><dd id="live-node-beats">false</dd></div>
+              <div><dt>termination</dt><dd id="live-node-termination">no — continue</dd></div>
+            </dl>
+          </aside>
+        </div>
+        <p class="aside-note">d4 + d6 vs. 10 produces 67 visited nodes in this explicit tree.</p>
+      </section>
+
+      <section class="algo-slide" data-slide="7">
+        <div class="slide-kicker">Pruning</div>
+        <h2>Most branches end <em>immediately.</em></h2>
+        <div class="terminal-layout">
+          <div class="terminal success-terminal">
+            <span>SUCCESS TERMINAL</span>
+            <b>total ≥ target</b>
+            <p>Record this node’s path probability. Do not roll again—even if one of its dice exploded. Positive rerolls cannot undo success.</p>
+          </div>
+          <div class="terminal failure-terminal">
+            <span>FAILURE TERMINAL</span>
+            <b>total &lt; target<br />and no active dice</b>
+            <p>There is nothing left to roll. This branch can never change, so return immediately.</p>
+          </div>
+        </div>
+        <div class="continue-rule">Recurse only when <b>total &lt; target</b> and <b>at least one die exploded.</b></div>
+      </section>
+
+      <section class="algo-slide" data-slide="8">
+        <div class="slide-kicker">The data model</div>
+        <h2>A tree in code. <em>A graph in the model.</em></h2>
+        <div class="model-compare">
+          <div>
+            <h3>Recorded histories form a tree</h3>
+            <div class="simple-tree" aria-hidden="true">
+              <b>A</b><div><b>B</b><b>C</b></div><div><b>D</b><b>E</b><b>F</b><b>G</b></div>
+            </div>
+            <p>Every unique sequence of rolls gets its own path and terminal leaf.</p>
+          </div>
+          <div>
+            <h3>Equivalent states can form a DAG</h3>
+            <div class="simple-dag" aria-hidden="true">
+              <div><b>A</b><b>B</b></div><b class="merged">same state</b><b>terminal</b>
+            </div>
+            <p>Two histories that reach the same <code>(total, active dice)</code> can be merged or memoized.</p>
+          </div>
+        </div>
+        <p class="aside-note strong">The recursive implementation walks a weighted result tree; graph language describes the reusable state structure beneath it.</p>
+      </section>
+
+      <section class="algo-slide" data-slide="9">
+        <div class="slide-kicker">Efficiency—or the lack of it</div>
+        <h2>This is brute force.<br /><em>Tabletop inputs are tiny.</em></h2>
+        <div class="performance-grid">
+          <div><b>1</b><h3>Enumerate everything reachable</h3><p>There is no shortcut here: the search explicitly visits every roll combination that can still matter.</p></div>
+          <div><b>2</b><h3>Scaling gets ugly</h3><p>More dice, larger dice, and higher targets multiply the branch count. At large scale this becomes horrendous.</p></div>
+          <div><b>3</b><h3>Pruning rescues real rolls</h3><p>Success stops a subtree, ordinary non-max rolls stop failures, and only exploding dice continue.</p></div>
+          <div><b>4</b><h3>The domain stays small</h3><p>Tabletop pools are a handful of d4–d12 dice and targets in the tens—not millions of dice or enormous totals.</p></div>
+        </div>
+        <p class="complexity-note">It is acceptable because the problem domain is constrained—not because brute force suddenly became efficient.</p>
+      </section>
+
+      <section class="algo-slide leaf-partition-slide" data-slide="10">
+        <div class="slide-kicker">The completed tree</div>
+        <h2>Every terminal history lands in <em>one of two buckets.</em></h2>
+        <div class="leaf-buckets">
+          <div class="success-bucket">
+            <span>SUCCESS LEAVES</span>
+            <h3>target reached</h3>
+            <div class="bucket-leaves"><b>p₁</b><b>p₂</b><b>p₃</b><i>…</i></div>
+            <code>Σ success leaf weights</code>
+          </div>
+          <div class="failure-bucket">
+            <span>FAILURE LEAVES</span>
+            <h3>below target · no explosions</h3>
+            <div class="bucket-leaves"><b>q₁</b><b>q₂</b><b>q₃</b><i>…</i></div>
+            <code>Σ failure leaf weights</code>
+          </div>
+        </div>
+        <div class="partition-equations">
+          <b>Σ success + Σ failure = 100%</b>
+          <span>therefore</span>
+          <strong>P(success) = Σ success = 100% − Σ failure</strong>
+        </div>
+      </section>
+
+      <section class="algo-slide correction-slide" data-slide="11">
+        <div class="slide-kicker">Final aggregation · one important correction</div>
+        <h2>The complement is right.<br /><em>The product is not.</em></h2>
+        <div class="aggregation-layout">
+          <div class="leaf-sum">
+            <span class="method-label">ORIGINAL FINAL STEP</span>
+            <strong class="wrong-formula">1 − ∏(1 − pᵢ)</strong>
+            <p>This is the union formula for <b>independent</b> events.</p>
+            <span class="method-label">TREE LEAVES</span>
+            <strong>P(success) = p₁ + p₂ + p₃ + …</strong>
+            <p>Distinct terminal histories are <b>mutually exclusive</b>.</p>
+          </div>
+          <div class="correction-copy">
+            <div class="counterexample">
+              <span>Sanity check</span>
+              <b>Two exhaustive leaves · 50% each</b>
+              <code>correct: 50% + 50% = 100%</code>
+              <code>product: 1 − (.5 × .5) = 75%</code>
+            </div>
+            <p>One roll can follow exactly one path and end at exactly one leaf. The leaf weights already include every parent probability along that path.</p>
+            <div class="result-compare"><span>Original final aggregation</span><b>23.0668%</b><span>Sum of success leaves</span><b>26.0417%</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="algo-slide code-slide" data-slide="12">
+        <div class="slide-kicker">The complete idea</div>
+        <h2>The algorithm is <em>recursive enumeration with pruning.</em></h2>
+        <div class="code-layout">
+          <pre><code><span>search(state):</span>
+  active = dice_that_exploded(state)
+  if active is empty: return
+
+  for rolls in all_combinations(active):
+    child.total = state.total + sum(rolls)
+    child.p = state.p / combination_count
+
+    if child.total &gt;= target:
+      record child.p
+    else:
+      search(child)
+
+success = sum(recorded_probabilities)</code></pre>
+          <div class="code-summary">
+            <b>Branch.</b>
+            <b>Weight.</b>
+            <b>Prune.</b>
+            <b>Add the leaves.</b>
+            <a href="index.html#odds">Return to the calculator <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="deck-controls">
+      <button id="previous-slide" type="button" aria-label="Previous slide"><span aria-hidden="true">←</span> Previous</button>
+      <div class="progress-track" aria-hidden="true"><i id="progress-bar"></i></div>
+      <button id="next-slide" type="button">Next <span aria-hidden="true">→</span></button>
+    </footer>
+  </body>
+</html>
