@@ -219,56 +219,23 @@
         <p class="complexity-note">It is acceptable because the problem domain is constrained—not because brute force suddenly became efficient.</p>
       </section>
 
-      <section class="algo-slide leaf-partition-slide" data-slide="10">
-        <div class="slide-kicker">The completed tree</div>
-        <h2>Every terminal history lands in <em>one of two buckets.</em></h2>
-        <div class="leaf-buckets">
-          <div class="success-bucket">
-            <span>SUCCESS LEAVES</span>
-            <h3>target reached</h3>
-            <div class="bucket-leaves"><b>p₁</b><b>p₂</b><b>p₃</b><i>…</i></div>
-            <code>Σ success leaf weights</code>
-          </div>
-          <div class="failure-bucket">
-            <span>FAILURE LEAVES</span>
-            <h3>below target · no explosions</h3>
-            <div class="bucket-leaves"><b>q₁</b><b>q₂</b><b>q₃</b><i>…</i></div>
-            <code>Σ failure leaf weights</code>
-          </div>
+      <section class="algo-slide aggregation-slide" data-slide="10">
+        <div class="slide-kicker">Combining the terminal successes</div>
+        <h2>Find the chance that <em>none of them occur.</em></h2>
+        <div class="aggregation-steps">
+          <div><span>01</span><b>Collect success nodes</b><p>Each “target reached” node carries its complete path probability <code>pᵢ</code>.</p></div>
+          <div><span>02</span><b>Flip each probability</b><p>The chance of that individual result not occurring is <code>1 − pᵢ</code>.</p></div>
+          <div><span>03</span><b>Multiply the non-results</b><p>Multiply every individual non-occurrence chance together.</p></div>
+          <div><span>04</span><b>Flip the combined result</b><p>Subtract from 100% to get the chance of at least one success.</p></div>
         </div>
-        <div class="partition-equations">
-          <b>Σ success + Σ failure = 100%</b>
-          <span>therefore</span>
-          <strong>P(success) = Σ success = 100% − Σ failure</strong>
+        <div class="aggregation-formula">
+          <span>P(no success result) = ∏(1 − pᵢ)</span>
+          <strong>P(success) = 1 − ∏(1 − pᵢ)</strong>
         </div>
+        <p class="aside-note strong">This is the final aggregation performed by the original Python implementation.</p>
       </section>
 
-      <section class="algo-slide correction-slide" data-slide="11">
-        <div class="slide-kicker">Final aggregation · one important correction</div>
-        <h2>The complement is right.<br /><em>The product is not.</em></h2>
-        <div class="aggregation-layout">
-          <div class="leaf-sum">
-            <span class="method-label">ORIGINAL FINAL STEP</span>
-            <strong class="wrong-formula">1 − ∏(1 − pᵢ)</strong>
-            <p>This is the union formula for <b>independent</b> events.</p>
-            <span class="method-label">TREE LEAVES</span>
-            <strong>P(success) = p₁ + p₂ + p₃ + …</strong>
-            <p>Distinct terminal histories are <b>mutually exclusive</b>.</p>
-          </div>
-          <div class="correction-copy">
-            <div class="counterexample">
-              <span>Sanity check</span>
-              <b>Two exhaustive leaves · 50% each</b>
-              <code>correct: 50% + 50% = 100%</code>
-              <code>product: 1 − (.5 × .5) = 75%</code>
-            </div>
-            <p>One roll can follow exactly one path and end at exactly one leaf. The leaf weights already include every parent probability along that path.</p>
-            <div class="result-compare"><span>Original final aggregation</span><b>23.0668%</b><span>Sum of success leaves</span><b>26.0417%</b></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="algo-slide code-slide" data-slide="12">
+      <section class="algo-slide code-slide" data-slide="11">
         <div class="slide-kicker">The complete idea</div>
         <h2>The algorithm is <em>recursive enumeration with pruning.</em></h2>
         <div class="code-layout">
@@ -285,12 +252,16 @@
     else:
       search(child)
 
-success = sum(recorded_probabilities)</code></pre>
+none = 1
+for p in recorded_probabilities:
+  none = none * (1 - p)
+
+success = 1 - none</code></pre>
           <div class="code-summary">
             <b>Branch.</b>
             <b>Weight.</b>
             <b>Prune.</b>
-            <b>Add the leaves.</b>
+            <b>Combine.</b>
             <a href="index.html#odds">Return to the calculator <span aria-hidden="true">→</span></a>
           </div>
         </div>
